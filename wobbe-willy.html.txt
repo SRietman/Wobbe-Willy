@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wobbe Willy – SHK-Orakel mit KI</title>
+  <script src="https://unpkg.com/vue@3"></script>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    #app {
+      background-color: #1e293b;
+      border: 2px solid #f97316;
+      border-radius: 1rem;
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #facc15;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 10px #f97316;
+    }
+    .subtext {
+      font-style: italic;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+    select, input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      border: 2px solid #f97316;
+      border-radius: 0.5rem;
+      background-color: #334155;
+      color: #f1f5f9;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      background-color: #f97316;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 0 10px #f97316;
+    }
+    button:hover {
+      background-color: #ea580c;
+      transform: scale(1.03);
+      box-shadow: 0 0 15px #f97316;
+    }
+    .antwort {
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+      color: #e2e8f0;
+      background-color: #0f172a;
+      border-left: 4px solid #f97316;
+      padding-left: 10px;
+      white-space: pre-line;
+    }
+    .bier {
+      font-size: 2rem;
+      margin-top: 10px;
+      animation: shake 0.4s ease-in-out;
+    }
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      50% { transform: rotate(10deg); }
+      75% { transform: rotate(-5deg); }
+      100% { transform: rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>🔧 Wobbe Willy 🔧</h1>
+    <div class="subtext">Dei SHK-Orakel mit KI – boarisch, grantig und gscheid</div>
+
+    <input v-model="frage" placeholder="Hau dei Frogn nei, Buam..." />
+    <button @click="antwortGeben">Schick's nei!</button>
+
+    <div class="antwort" v-if="antwort">
+      {{ antwort }}
+      <div class="bier">🍺 Gönn da a Hoibe!</div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          frage: '',
+          antwort: ''
+        };
+      },
+      methods: {
+        async antwortGeben() {
+          if (!this.frage) {
+            this.antwort = "Willy: Frag gscheid, Buam!";
+            return;
+          }
+
+          this.antwort = "I denk kurz nach... 🍺";
+
+          try {
+            const response = await fetch('https://wobbe-proxy.vercel.app/api/ask', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                prompt: this.frage
+              })
+            });
+
+            const data = await response.json();
+            this.antwort = data.result;
+          } catch (err) {
+            this.antwort = "Oida... da Server is grantig. Probier's nomoi!";
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
+
